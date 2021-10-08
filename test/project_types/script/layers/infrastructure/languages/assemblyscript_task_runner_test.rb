@@ -12,6 +12,8 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
   ABOVE_NPM_VERSION = "5.2.1"
   EXACT_NPM_VERSION = "5.2.0"
 
+  INSTALL_COMMAND = "npm install --no-audit --no-optional --legacy-peer-deps --loglevel error"
+
   let(:ctx) { TestHelpers::FakeContext.new }
   let(:script_id) { "id" }
   let(:script_name) { "foo" }
@@ -185,7 +187,7 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
         it "should raise error" do
           stub_tool_versions(npm: EXACT_NPM_VERSION, node: EXACT_NODE_VERSION)
           ctx.expects(:capture2e)
-            .with("npm install --no-audit --no-optional --legacy-peer-deps --loglevel error")
+            .with(INSTALL_COMMAND)
             .returns([nil, mock(success?: false)])
           assert_raises Script::Layers::Infrastructure::Errors::DependencyInstallationError do
             subject
@@ -197,7 +199,7 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
         it "should successfully install" do
           stub_tool_versions(npm: EXACT_NPM_VERSION, node: EXACT_NODE_VERSION)
           ctx.expects(:capture2e)
-            .with("npm install --no-audit --no-optional --legacy-peer-deps --loglevel error")
+            .with(INSTALL_COMMAND)
             .returns([nil, mock(success?: true)])
           subject
         end
@@ -213,7 +215,7 @@ describe Script::Layers::Infrastructure::Languages::AssemblyScriptTaskRunner do
             .with("node", "--version")
             .returns([EXACT_NODE_VERSION, mock(success?: true)])
           ctx.expects(:capture2e)
-            .with("npm install --no-audit --no-optional --legacy-peer-deps --loglevel error")
+            .with(INSTALL_COMMAND)
             .returns([msg, mock(success?: false)])
           assert_raises Script::Layers::Infrastructure::Errors::DependencyInstallationError, msg do
             subject
