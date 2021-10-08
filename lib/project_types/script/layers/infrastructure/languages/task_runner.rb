@@ -17,7 +17,7 @@ module Script
           end
 
           def check_system_dependencies!
-            self.class::REQUIRED_TOOL_VERSIONS.each { |tool| check_tool_version!(tool[:tool_name], tool[:min_version])}
+            self.class::REQUIRED_TOOL_VERSIONS.each { |tool| check_tool_version!(tool[:tool_name], tool[:min_version]) }
           end
 
           def install_dependencies
@@ -46,6 +46,7 @@ module Script
           end
 
           protected
+
           def check_tool_version!(tool, min_required_version)
             output, status = @ctx.capture2e(tool, "--version")
             unless status.success?
