@@ -10,10 +10,6 @@ module Script
           GEN_METADATA = "npm run gen-metadata"
           MIN_NPM_VERSION = "5.2.0"
           MIN_NODE_VERSION = "14.15.0"
-          REQUIRED_TOOL_VERSIONS = [
-            { "tool_name": "npm", "min_version": MIN_NPM_VERSION },
-            { "tool_name": "node", "min_version": MIN_NODE_VERSION },
-          ]
           INSTALL_COMMAND = "npm install --no-audit --no-optional --legacy-peer-deps --loglevel error"
 
           attr_reader :ctx, :script_name
@@ -27,6 +23,29 @@ module Script
           def build
             compile
             bytecode
+          end
+
+          def project_dependencies_installed?
+            # Assuming if node_modules folder exist at root of script folder, all deps are installed
+            ctx.dir_exist?("node_modules")
+          end
+
+          protected
+
+          def required_tool_versions
+            [
+              { "tool_name": "npm", "min_version": MIN_NPM_VERSION },
+              { "tool_name": "node", "min_version": MIN_NODE_VERSION },
+            ]
+          end
+
+          def tool_version_output(tool, min_required_version)
+            output, status = @ctx.capture2e(tool, "--version")
+            unless status.success?
+              raise Errors::NoDependencyInstalledError.new(tool, min_required_version)
+            end
+
+            output
           end
 
           private
