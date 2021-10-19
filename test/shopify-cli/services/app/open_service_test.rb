@@ -11,9 +11,9 @@ module ShopifyCLI
         end
 
         def test_call
-        ShopifyCLI::Context.any_instance.expects(:open_url!)
-          .with("https://example.com/login?shop=my-test-shop.myshopify.com")
-        run_cmd("app open")
+          ShopifyCLI::Context.any_instance.expects(:open_url!)
+            .with("https://example.com/login?shop=my-test-shop.myshopify.com")
+          run_cmd("app open")
         end
       end
     end

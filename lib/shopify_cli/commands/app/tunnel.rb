@@ -4,7 +4,7 @@ module ShopifyCLI
   module Commands
     class App
       class Tunnel < ShopifyCLI::Command::AppSubCommand
-        def call(args, name)
+        def call(args, _name)
           subcommand = args.shift
           case subcommand
           when "auth"

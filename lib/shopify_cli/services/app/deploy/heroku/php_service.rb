@@ -11,7 +11,6 @@ module ShopifyCLI
               super()
             end
 
-
             def call
               spin_group = CLI::UI::SpinGroup.new
               heroku_service = ShopifyCLI::Heroku.new(context)

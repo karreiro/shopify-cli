@@ -14,7 +14,8 @@ module ShopifyCLI
               project_context("app_types", "php")
 
               File.stubs(:exist?)
-              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "php", "cli.rb")).returns(true)
+              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "php",
+                "cli.rb")).returns(true)
               File.expects(:exist?).with(File.join(FIXTURE_DIR, "app_types", "php", ".shopify-cli.yml")).returns(true)
               ShopifyCLI::Context.any_instance.stubs(:os).returns(:mac)
               stub_successful_heroku_flow

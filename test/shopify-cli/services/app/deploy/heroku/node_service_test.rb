@@ -12,7 +12,8 @@ module ShopifyCLI
             def setup
               super
               File.stubs(:exist?)
-              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "node", "cli.rb")).returns(true)
+              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "node",
+                "cli.rb")).returns(true)
               ShopifyCLI::Context.any_instance.stubs(:os).returns(:mac)
               stub_successful_heroku_flow
             end
@@ -93,7 +94,8 @@ module ShopifyCLI
             def test_call_uses_existing_heroku_auth_if_available
               expects_heroku_whoami(status: true)
 
-              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account", "username"))
+              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account",
+                "username"))
 
               Services::App::Deploy::Heroku::NodeService.call(context: @context)
             end

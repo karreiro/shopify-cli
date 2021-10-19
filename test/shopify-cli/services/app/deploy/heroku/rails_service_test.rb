@@ -12,7 +12,8 @@ module ShopifyCLI
             def setup
               super
               File.stubs(:exist?)
-              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "rails", "cli.rb")).returns(true)
+              File.stubs(:exist?).with(File.join(ShopifyCLI::ROOT, "lib", "project_types", "rails",
+                "cli.rb")).returns(true)
               @context.stubs(:os).returns(:mac)
               stub_successful_heroku_flow
             end
@@ -117,7 +118,8 @@ module ShopifyCLI
             def test_call_uses_existing_heroku_auth_if_available
               expects_heroku_whoami(status: true)
 
-              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account", "username"))
+              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account",
+                "username"))
 
               Services::App::Deploy::Heroku::RailsService.call(context: @context)
             end
@@ -141,7 +143,8 @@ module ShopifyCLI
             def test_call_uses_existing_heroku_app_if_available
               expects_git_remote_get_url_heroku(status: true, remote: "heroku")
 
-              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account", "username"))
+              @context.expects(:puts).with(@context.message("core.app.deploy.heroku.authenticated_with_account",
+                "username"))
 
               Services::App::Deploy::Heroku::RailsService.call(context: @context)
             end
@@ -158,7 +161,7 @@ module ShopifyCLI
                 .with(@context.message("core.app.deploy.heroku.app.name"))
                 .returns("app-name")
 
-                Services::App::Deploy::Heroku::RailsService.call(context: @context)
+              Services::App::Deploy::Heroku::RailsService.call(context: @context)
             end
 
             def test_call_raises_if_choosing_existing_heroku_app_fails
@@ -218,7 +221,7 @@ module ShopifyCLI
                 .with(@context.message("core.app.deploy.heroku.git.what_branch"))
                 .returns("other_branch")
 
-                Services::App::Deploy::Heroku::RailsService.call(context: @context)
+              Services::App::Deploy::Heroku::RailsService.call(context: @context)
             end
 
             def test_call_raises_if_finding_branches_fails

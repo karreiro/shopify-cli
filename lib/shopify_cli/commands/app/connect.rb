@@ -2,7 +2,7 @@ module ShopifyCLI
   module Commands
     class App
       class Connect < ShopifyCLI::Command::AppSubCommand
-        def call(args, command_name, *)
+        def call(_args, _command_name, *)
           app_type = detect_app(directory: Dir.pwd)
           project = ShopifyCLI::Project.current
 

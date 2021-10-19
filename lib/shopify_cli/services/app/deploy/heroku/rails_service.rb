@@ -5,7 +5,7 @@ module ShopifyCLI
         module Heroku
           class RailsService < BaseService
             DB_CHECK_CMD = 'bundle exec rails runner "puts ActiveRecord::Base.connection.adapter_name.downcase"'
-            
+
             attr_reader :context
 
             def initialize(context:)
@@ -22,16 +22,16 @@ module ShopifyCLI
                 end
                 true
               end
-  
+
               spin_group = CLI::UI::SpinGroup.new
               heroku_service = ShopifyCLI::Heroku.new(context)
-  
+
               spin_group.add(context.message("core.app.deploy.heroku.downloading")) do |spinner|
                 heroku_service.download
                 spinner.update_title(context.message("core.app.deploy.heroku.downloaded"))
               end
               spin_group.wait
-  
+
               spin_group.add(context.message("core.app.deploy.heroku.installing")) do |spinner|
                 heroku_service.install
                 spinner.update_title(context.message("core.app.deploy.heroku.installed"))
@@ -41,7 +41,7 @@ module ShopifyCLI
                 spinner.update_title(context.message("core.app.deploy.heroku.git.initialized"))
               end
               spin_group.wait
-  
+
               if (account = heroku_service.whoami)
                 context.puts(context.message("core.app.deploy.heroku.authenticated_with_account", account))
               else
@@ -52,7 +52,7 @@ module ShopifyCLI
                   heroku_service.authenticate
                 end
               end
-  
+
               if (app_name = heroku_service.app)
                 context.puts(context.message("core.app.deploy.heroku.app.selected", app_name))
               else
@@ -60,7 +60,7 @@ module ShopifyCLI
                   handler.option(context.message("core.app.deploy.heroku.app.create")) { :new }
                   handler.option(context.message("core.app.deploy.heroku.app.select")) { :existing }
                 end
-  
+
                 if app_type == :existing
                   app_name = CLI::UI::Prompt.ask(context.message("core.app.deploy.heroku.app.name"))
                   CLI::UI::Frame.open(
@@ -78,7 +78,7 @@ module ShopifyCLI
                   end
                 end
               end
-  
+
               branches = ShopifyCLI::Git.branches(context)
               if branches.length == 1
                 branch_to_deploy = branches[0]
@@ -90,7 +90,7 @@ module ShopifyCLI
                   end
                 end
               end
-  
+
               CLI::UI::Frame.open(
                 context.message("core.app.deploy.heroku.deploying"),
                 success_text: context.message("core.app.deploy.heroku.deployed")
@@ -98,9 +98,9 @@ module ShopifyCLI
                 heroku_service.deploy(branch_to_deploy)
               end
             end
-            
+
             private
-            
+
             def check_db(context)
               out, stat = context.capture2e(DB_CHECK_CMD)
               if stat.success? && out.strip == "sqlite"

@@ -105,7 +105,7 @@ module ShopifyCLI
                 setting_configs: "Setting Shopify app configs…",
                 configs_set: "{{v}} Shopify app configs set",
               },
-              }
+            },
           },
           connect: {
             help: <<~HELP,
@@ -156,7 +156,7 @@ module ShopifyCLI
             running_server: "Running server…",
             error: {
               host_must_be_https: "HOST must be a HTTPS url.",
-              invalid_port: "%s is not a valid port."
+              invalid_port: "%s is not a valid port.",
             },
           },
           open: {

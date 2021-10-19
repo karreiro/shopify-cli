@@ -23,19 +23,15 @@ module ShopifyCLI
               )
             end
           when nil
-            raise ShopifyCLI::Abort.new(
-              @ctx.message(
-                "core.app.deploy.error.missing_platform",
-                ShopifyCLI::TOOL_NAME
-              )
+            raise ShopifyCLI::Abort, @ctx.message(
+              "core.app.deploy.error.missing_platform",
+              ShopifyCLI::TOOL_NAME
             )
           else
-            raise ShopifyCLI::Abort.new(
-              @ctx.message(
-                "core.app.deploy.error.invalid_platform",
-                platform,
-                ShopifyCLI::TOOL_NAME
-              )
+            raise ShopifyCLI::Abort, @ctx.message(
+              "core.app.deploy.error.invalid_platform",
+              platform,
+              ShopifyCLI::TOOL_NAME
             )
           end
         end
