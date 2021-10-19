@@ -92,7 +92,7 @@ module Script
       def perform_command
         run_cmd(
           "script create --name=#{@script_name}
-          --extension-point=#{@ep_type} --language=#{@language}
+          --api=#{@ep_type} --language=#{@language}
           --branch=#{@branch}
           #{@no_config_ui ? "--no-config-ui" : ""}"
         )

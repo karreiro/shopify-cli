@@ -162,7 +162,7 @@ module Script
               Usage: {{command:%1$s script create}}
               Options:
                 {{command:--name=NAME}} Script project name. Use any string.
-                {{command:--extension-point=TYPE}} Script API name. Allowed values: %2$s.
+                {{command:--api=TYPE}} Script API name. Allowed values: %2$s.
                 {{command:--no-config-ui}} Specify this option when you don’t want your script to render an interface in Shopify admin.
           HELP
 
