@@ -19,7 +19,7 @@ class Javy
   end
 
   def build(source:, dest:)
-    exec("#{source} -o #{dest}")
+    exec(source, '-o', dest)
   end
 
   private

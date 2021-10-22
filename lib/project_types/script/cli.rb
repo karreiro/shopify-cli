@@ -13,6 +13,11 @@ module Script
     hidden_feature(feature_set: :script_project)
     subcommand :Create, "create", Project.project_filepath("commands/create")
     subcommand :Push, "push", Project.project_filepath("commands/push")
+    subcommand :Tools, "tools", Project.project_filepath("commands/tools")
+
+    class Tools
+      subcommand :Javy, "javy", Project.project_filepath("commands/tools/javy")
+    end
   end
   ShopifyCLI::Commands.register("Script::Command", "script")
 
