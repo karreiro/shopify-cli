@@ -214,10 +214,30 @@ module ShopifyCLI
         @queue << operation unless @queue.closed?
       end
 
+      def skipped_by_user?(operation)
+        file = operation&.file
+        method = operation&.method
+
+        return unless file
+        return unless file.json?
+        return unless [:update, :delete].include?(method)
+        return unless file_has_changed?(file)
+        return unless has_conflicts?(operation)
+
+        # sychronized start
+        merge_handler = MergeHandler.new(operation)
+        merge_handler.solve! if merge_handler.has_conflicts?
+        # sychronized end
+
+        merge_handler.skip_local_updates?
+      end
+
       def perform(operation)
         return if @queue.closed?
         wait_for_backoff!
         @ctx.debug(operation.to_s)
+
+        return if skipped_by_user?(operation)
 
         response = send(operation.method, operation.file)
 
@@ -232,6 +252,7 @@ module ShopifyCLI
         error_suffix = ":\n  " + parse_api_errors(e).join("\n  ")
         report_error(operation, error_suffix)
       ensure
+        puts "removing operation da fila de pending: #{operation}"
         @pending.delete(operation)
       end
 
