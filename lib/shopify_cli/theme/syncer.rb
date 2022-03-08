@@ -43,6 +43,9 @@ module ShopifyCLI
         # Mutex used to coordinate changes in the checksums (shared accross all threads)
         @checksums_mutex = Mutex.new
 
+        # Mutex used to throttle threads when the CLI prompts users' input
+        @users_input_mutex = Mutex.new
+
         # Latest theme assets checksums. Updated on each upload.
         @checksums = {}
 
@@ -214,22 +217,24 @@ module ShopifyCLI
         @queue << operation unless @queue.closed?
       end
 
-      def skipped_by_user?(operation)
-        file = operation&.file
-        method = operation&.method
+      def skip_to_avoid_conflicts?(operation)
+        conflict_handler = ConflictHandler.new(operation)
 
-        return unless file
-        return unless file.json?
-        return unless [:update, :delete].include?(method)
-        return unless file_has_changed?(file)
-        return unless has_conflicts?(operation)
+        return unless protect_from_overriding?(operation)
+        return unless conflict_handler.any_conflict?
+ 
+        @users_input_mutex.synchronize do
+          conflict_handler.ask_to_solve!
+        end
 
-        # sychronized start
-        merge_handler = MergeHandler.new(operation)
-        merge_handler.solve! if merge_handler.has_conflicts?
-        # sychronized end
+        conflict_handler.skip_local_updates?
+      end
 
-        merge_handler.skip_local_updates?
+      def protect_from_overriding?(operation)
+        json_file = operation.file.json?
+        destructive_operation = [:update, :delete].include?(operation.method)
+
+        json_file && destructive_operation
       end
 
       def perform(operation)
@@ -237,7 +242,7 @@ module ShopifyCLI
         wait_for_backoff!
         @ctx.debug(operation.to_s)
 
-        return if skipped_by_user?(operation)
+        return if skip_to_avoid_conflicts?(operation)
 
         response = send(operation.method, operation.file)
 
@@ -360,7 +365,7 @@ module ShopifyCLI
         parsed_body = JSON.parse(exception&.response&.body)
         message = parsed_body.dig("errors", "asset") || parsed_body["message"] || exception.message
         # Truncate to first lines
-        [message].flatten.map { |mess| mess.split("\n", 2).first }
+        [message].flatten.map { |m| m.split("\n", 2).first }
       rescue JSON::ParserError
         [exception.message]
       end
