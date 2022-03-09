@@ -103,7 +103,7 @@ module ShopifyCLI
       end
 
       ##
-      # Run git three-way file merge
+      # Run git three-way file merge (it doesn't require an initialized git repository)
       #
       # #### Parameters
       #
@@ -111,12 +111,13 @@ module ShopifyCLI
       # * base_file    - string path of the base file
       # * other_file   - string path of the other file
       # * opts         - list of "git merge-file" options. Valid values:
-      #                  - "-p"       - end results to standard output instead of overwriting `current_file`
       #                  - "-q"       - do not warn about conflicts
       #                  - "--diff3"  - show conflicts
       #                  - "--ours"   - resolved favouring lines from `current_file`
       #                  - "--theirs" - resolved favouring lines from `other_file`
       #                  - "--union"  - resolved favouring lines from both files
+      #                  - "-p"       - send results to standard output instead of
+      #                                 overwriting the `current_file`
       #
       # #### Returns
       #

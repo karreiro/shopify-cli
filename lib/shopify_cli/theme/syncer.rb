@@ -3,10 +3,12 @@ require "thread"
 require "json"
 require "base64"
 require "forwardable"
+require "pry"
 
 require_relative "syncer/error_reporter"
 require_relative "syncer/standard_reporter"
 require_relative "syncer/operation"
+require_relative "syncer/git_merge"
 
 module ShopifyCLI
   module Theme
@@ -217,18 +219,18 @@ module ShopifyCLI
         @queue << operation unless @queue.closed?
       end
 
-      def skip_to_avoid_conflicts?(operation)
-        conflict_handler = ConflictHandler.new(operation)
+      # def skip_to_avoid_conflicts?(operation)
+      #   conflict_handler = ConflictHandler.new(operation)
 
-        return unless protect_from_overriding?(operation)
-        return unless conflict_handler.any_conflict?
- 
-        @users_input_mutex.synchronize do
-          conflict_handler.ask_to_solve!
-        end
+      #   return unless protect_from_overriding?(operation)
+      #   return unless conflict_handler.any_conflict?
 
-        conflict_handler.skip_local_updates?
-      end
+      #   @users_input_mutex.synchronize do
+      #     conflict_handler.ask_to_solve!
+      #   end
+
+      #   conflict_handler.skip_local_updates?
+      # end
 
       def protect_from_overriding?(operation)
         json_file = operation.file.json?
@@ -242,7 +244,7 @@ module ShopifyCLI
         wait_for_backoff!
         @ctx.debug(operation.to_s)
 
-        return if skip_to_avoid_conflicts?(operation)
+        # return if skip_to_avoid_conflicts?(operation)
 
         response = send(operation.method, operation.file)
 
@@ -257,7 +259,7 @@ module ShopifyCLI
         error_suffix = ":\n  " + parse_api_errors(e).join("\n  ")
         report_error(operation, error_suffix)
       ensure
-        puts "removing operation da fila de pending: #{operation}"
+        # puts "removing operation da fila de pending: #{operation}"
         @pending.delete(operation)
       end
 
@@ -268,6 +270,9 @@ module ShopifyCLI
         else
           asset[:attachment] = Base64.encode64(file.read)
         end
+
+        # @file = file
+        # pry.binding
 
         _status, body, response = ShopifyCLI::AdminAPI.rest_request(
           @ctx,
@@ -316,6 +321,16 @@ module ShopifyCLI
         )
 
         update_checksums(body)
+
+        # attachment = body.dig("asset", "attachment")
+        # content = ""
+        # if attachment
+        #   content = Base64.decode64(attachment)
+        # else
+        #   content = body.dig("asset", "value")
+        # end
+
+        # GitMerge.merge!(file, content) # get str to windows capabilities
 
         attachment = body.dig("asset", "attachment")
         if attachment

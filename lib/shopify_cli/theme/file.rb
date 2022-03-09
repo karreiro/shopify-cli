@@ -84,6 +84,14 @@ module ShopifyCLI
         relative_path == other.relative_path
       end
 
+      def name(*args)
+        ::File.basename(path, *args)
+      end
+
+      def absolute_path
+        path.realpath.to_s
+      end
+
       private
 
       def normalize_json(content)

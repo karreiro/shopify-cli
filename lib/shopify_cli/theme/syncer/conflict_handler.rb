@@ -11,13 +11,12 @@ module ShopifyCLI
         end
 
         def merge!
-
         end
 
         def ask_to_solve!
           # @strategy_to_solve = select_strategy_to_solve
 
-          # case 
+          # case
           # when :keep_local
           # when :keep_remote
           # when :auto_merge
