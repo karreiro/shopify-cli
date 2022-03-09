@@ -119,6 +119,24 @@ module Theme
               fixed: "Fixed",
             },
           },
+          syncer: {
+            forms: {
+              update_strategy: {
+                title: "The file '%s' has been recently modified on your remote development theme. What would you like to do:",
+                keep_remote: "Keep the remote version",
+                keep_local: "Keep the local version",
+                auto_merge: "Merge files (notice, it may breack the your file)",
+                show_diff: "Show the difference between both versions (before deciding)",
+                exit: "Exit",
+              },
+              remove_strategy: {
+                title: "The file '%s' has been recently removed from your remote development theme. What would you like to do:",
+                remove: "Remove permanently",
+                restore: "Restore with the local version",
+                exit: "Exit",
+              }
+            }
+          },
           error: {
             address_binding_error: "Couldn't bind to localhost."\
               " To serve your theme, set a different address with {{command:%s theme serve --host=<address>}}",

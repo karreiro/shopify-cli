@@ -16,7 +16,7 @@ module ShopifyCLI
 
           def perform!
             @syncer.fetch_checksums!
-            @syncer.enqueue_get(@theme.json_files)
+            @syncer.enqueue_get(@theme.json_files, merge: true)
           end
         end
       end

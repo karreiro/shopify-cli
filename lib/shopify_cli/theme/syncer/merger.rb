@@ -5,16 +5,16 @@ require "tempfile"
 module ShopifyCLI
   module Theme
     class Syncer
-      class GitMerge
+      class Merger
         class << self
           def merge!(theme_file, new_content)
             remote_file = create_tmp_file(theme_file, new_content)
             remote_path = remote_file.path
             local_path = theme_file.absolute_path
 
-            ShopifyCLI::Git.merge_file(local_path, local_path, remote_path)
+            ShopifyCLI::Git.merge_file(local_path, local_path, remote_path, ["--theirs", "-p"])
           ensure
-            remote_file.close! # Remove temporary files on Windows as well
+            remote_file.close! # Remove temporary file on Windows as well
           end
 
           private

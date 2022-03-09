@@ -53,7 +53,7 @@ module ShopifyCLI
             if block_given?
               yield @syncer
             else
-              @syncer.upload_theme!(delay_low_priority_files: true)
+              @syncer.upload_theme!(delay_low_priority_files: true, overwrite_json_files: false)
             end
 
             return if stopped

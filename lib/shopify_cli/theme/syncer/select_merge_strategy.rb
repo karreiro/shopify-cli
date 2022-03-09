@@ -3,7 +3,7 @@
 module ShopifyCLI
   module Theme
     class Syncer
-      class ConflictHandler
+      class SelectMergeStrategy
         attr_reader :operation, :strategy_to_solve
 
         def initialize(operation)

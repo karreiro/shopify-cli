@@ -4,6 +4,7 @@ module ShopifyCLI
   module Theme
     class Syncer
       class Operation
+        attr_reader :options
         attr_accessor :method, :file
 
         COLOR_BY_STATUS = {
@@ -12,10 +13,11 @@ module ShopifyCLI
           fixed: :cyan,
         }
 
-        def initialize(ctx, method, file)
+        def initialize(ctx, method, file, options)
           @ctx = ctx
           @method = method
           @file = file
+          @options = options
         end
 
         def to_s
