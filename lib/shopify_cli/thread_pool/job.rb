@@ -3,7 +3,11 @@
 module ShopifyCLI
   class ThreadPool
     class Job
-      attr_reader :error
+      attr_reader :error, :interval
+
+      def initialize(interval = 0)
+        @interval = interval
+      end
 
       def perform!
         raise "`#{self.class.name}#perform!` must be defined"
@@ -21,6 +25,10 @@ module ShopifyCLI
 
       def error?
         !!@error
+      end
+
+      def recurring?
+        interval != 0
       end
     end
   end

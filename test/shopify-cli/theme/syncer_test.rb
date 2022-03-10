@@ -237,7 +237,7 @@ module ShopifyCLI
 
       def test_download_theme
         @syncer.start_threads
-        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path.to_s, "OUTDATED"] }.to_h)
+        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path, "OUTDATED"] }.to_h)
         @syncer.checksums.delete("assets/generated.css.liquid")
 
         expected_size = @theme.theme_files.size - 1 # 1 deleted file
@@ -269,7 +269,7 @@ module ShopifyCLI
         @syncer.include_filter.expects(:match?).with("layout/theme.liquid").returns(true)
 
         @syncer.start_threads
-        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path.to_s, "OUTDATED"] }.to_h)
+        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path, "OUTDATED"] }.to_h)
 
         File.any_instance.expects(:write)
           .with("new content")
@@ -297,7 +297,7 @@ module ShopifyCLI
         @syncer.ignore_filter.expects(:ignore?).with(@theme["assets/generated.css.liquid"].path).returns(true)
 
         @syncer.start_threads
-        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path.to_s, file.checksum] }.to_h)
+        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path, file.checksum] }.to_h)
         @syncer.checksums.delete("assets/generated.css.liquid")
 
         File.any_instance.expects(:delete).never
@@ -313,7 +313,7 @@ module ShopifyCLI
 
       def test_download_theme_without_checksum
         @syncer.start_threads
-        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path.to_s, nil] }.to_h)
+        @syncer.checksums.replace(@theme.theme_files.map { |file| [file.relative_path, nil] }.to_h)
 
         expected_size = @theme.theme_files.size
 
@@ -359,7 +359,7 @@ module ShopifyCLI
 
         response_assets = expected_files.map do |file|
           {
-            "key" => file.relative_path.to_s,
+            "key" => file.relative_path,
             "checksum" => file.checksum,
           }
         end

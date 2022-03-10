@@ -7,6 +7,8 @@ module Theme
           Suite of commands for developing Shopify themes. See {{command:%1$s theme <command> --help}} for usage of each command.
             Usage: {{command:%1$s theme [ %2$s ]}}
         HELP
+        ensure_user_error: "You are not authorized to edit themes on %s.",
+        ensure_user_try_this: "Make sure you are a user of that store, and allowed to edit themes.",
 
         init: {
           help: <<~HELP,
@@ -117,6 +119,34 @@ module Theme
               error: "ERROR",
               synced: "Synced",
               fixed: "Fixed",
+            },
+          },
+          syncer: {
+            forms: {
+              apply_to_all: {
+                title: "Would like apply this to other files?",
+                yes: "Yes",
+                no: "No",
+              },
+              update_strategy: {
+                title: <<~TITLE,
+                  The local file '%s' is different from the remote file in the development theme.
+                  What would you like to do?
+                TITLE
+                keep_remote: "Keep the remote version",
+                keep_local: "Keep the local version",
+                remote_merge: "Merge files (it may break the local file)",
+                exit: "Exit",
+              },
+              delete_strategy: {
+                title: <<~TITLE,
+                  The file '%s' has been recently removed from your remote development theme.
+                  What would you like to do?
+                TITLE
+                delete: "Delete permanently",
+                restore: "Restore with the local version",
+                exit: "Exit",
+              },
             },
           },
           error: {
