@@ -12,11 +12,14 @@ module ShopifyCLI
           def initialize(ctx)
             @ctx = ctx
             @value = nil
+            @apply = nil
           end
 
           def apply?(value)
-            return @value unless @value.nil?
-            @value = ask.apply?
+            return @value unless @apply.nil?
+            @apply = ask.apply?
+            @value = value if @apply
+            @apply
           end
 
           private
