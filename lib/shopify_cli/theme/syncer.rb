@@ -8,11 +8,18 @@ require_relative "syncer/error_reporter"
 require_relative "syncer/standard_reporter"
 require_relative "syncer/operation"
 require_relative "theme_admin_api"
+require_relative "syncer/merger"
 
 module ShopifyCLI
   module Theme
     class Syncer
       extend Forwardable
+
+      QUEUEABLE_METHODS = %i[
+        get
+        update
+        delete
+      ]
 
       attr_reader :checksums
       attr_reader :checksums_mutex
@@ -61,16 +68,16 @@ module ShopifyCLI
         @reporters.each(&:enable!)
       end
 
-      def enqueue_updates(files)
-        files.each { |file| enqueue(:update, file) }
+      def enqueue_updates(files, opts = {})
+        files.each { |file| enqueue(:update, file, opts) }
       end
 
-      def enqueue_get(files)
-        files.each { |file| enqueue(:get, file) }
+      def enqueue_get(files, opts = {})
+        files.each { |file| enqueue(:get, file, opts) }
       end
 
-      def enqueue_deletes(files)
-        files.each { |file| enqueue(:delete, file) }
+      def enqueue_deletes(files, opts = {})
+        files.each { |file| enqueue(:delete, file, opts) }
       end
 
       def size
@@ -131,24 +138,13 @@ module ShopifyCLI
         end
       end
 
-      def upload_theme!(delay_low_priority_files: false, delete: true, &block)
+      def upload_theme!(delay_low_priority_files: false, delete: true, overwrite_json_files: true, &block)
         fetch_checksums!
 
-        if delete
-          # Delete remote files not present locally
-          removed_files = checksums.keys - @theme.theme_files.map { |file| file.relative_path.to_s }
-          enqueue_deletes(removed_files)
-        end
-
-        # Some files must be uploaded after the other ones
-        delayed_config_files = [
-          @theme["config/settings_schema.json"],
-          @theme["config/settings_data.json"],
-        ]
+        delete_files_not_present_locally if delete
 
         enqueue_updates(@theme.liquid_files)
-        enqueue_updates(@theme.json_files - delayed_config_files)
-        enqueue_updates(delayed_config_files)
+        enqueue_json_updates(overwrite_json_files)
 
         if delay_low_priority_files
           # Wait for liquid & JSON files to upload, because those are rendered remotely
@@ -171,7 +167,7 @@ module ShopifyCLI
         if delete
           # Delete local files not present remotely
           missing_files = @theme.theme_files
-            .reject { |file| checksums.key?(file.relative_path.to_s) }.uniq
+            .reject { |file| checksums.key?(file.relative_path) }.uniq
             .reject { |file| ignore_file?(file) }
           missing_files.each do |file|
             @ctx.debug("rm #{file.relative_path}")
@@ -186,15 +182,114 @@ module ShopifyCLI
 
       private
 
+      def delete_files_not_present_locally(overwrite_json_files)
+        removed_files = []
+        restored_files = []
+
+        # Delete remote non-json-files that are not present locally
+        removed_files += @theme
+          .theme_files
+          .reject(&:json?)
+          .select { |file| !present_locally?(file) }
+          .map { |file| file.relative_path }
+
+        # Ask if remote json-files not present locally must be removed
+        apply_to_all = ApplyToAll.new(@ctx)
+        json_files = @theme.json_files.select { |file| !present_locally?(file) }
+        json_files
+          .each do |file|
+            action = apply_to_all.value || ask_delete_or_restore?(file)
+            apply_to_all.apply?(action) if json_files.size > 1
+
+            if overwrite_json_files != false || action == :delete
+              removed_files << file
+              next
+            end
+
+            if action == :restore
+              restored_files << file
+            end
+          end
+        end
+
+        enqueue_deletes(removed_files)
+        enqueue_get(restored_files)
+      end
+
+      def enqueue_json_updates(overwrite_json_files)
+        updated_files = []
+        outdated_files = []
+
+        # Some files must be uploaded after the other ones
+        delayed_config_files = [
+          @theme["config/settings_schema.json"],
+          @theme["config/settings_data.json"],
+        ]
+
+        json_files = @theme.json_files - delayed_config_files + delayed_config_files
+
+        if overwrite_json_files != false
+          enqueue_updates(removed_files)
+          return
+        end
+
+        apply_to_all = ApplyToAll.new(@ctx)
+        modified_json_files = json_files.select { |file| !ignore_file?(file) && file_has_changed?(file) }
+        modified_json_files.each do |file|
+
+          update_strategy = apply_to_all.value || ask_update_strategy(file)
+          apply_to_all.apply?(update_strategy) if modified_json_files.size > 1
+
+          case update_strategy
+          when :keep_remote
+            enqueue(:get, file)
+          when :remote_merge
+            enqueue(:update, file, merge: true)
+          when :keep_local
+            enqueue(:update, file)
+          end
+        end
+      end
+
+      def present_locally?(file)
+        checksums.keys.include?(file.relative_path)
+      end
+
+      def ask_update_strategy(file)
+        Forms::SelectUpdateStrategy.new(file).ask.strategy
+      end
+
+      def ask_delete_or_restore?(file)
+        Forms::SelectDeleteStrategy.new(@ctx, [], file: file).ask.strategy
+      end
+
+      def remote_text_content(file)
+        _status, body, _response = api_client.get(
+          path: "themes/#{@theme.id}/assets.json",
+          query: URI.encode_www_form("asset[key]" => file.relative_path),
+        )
+
+        body.dig("asset", "value")
+      end
+
+      def asset_update_param(file, merge)
+        asset = { key: file.relative_path }
+
+        return asset.merge(attachment: Base64.encode64(file.read)) unless file.text?
+        return asset.merge(value: file.read) unless merge
+        return asset.merge(value: Merger.merge!(file, remote_text_content(file)))
+      end
+
       def report_error(operation, error_suffix = "")
         @error_checksums << @checksums[operation.file_path]
         @error_reporter.report("#{operation.as_error_message}#{error_suffix}")
       end
 
-      def enqueue(method, file)
+      def enqueue(method, file, opts = {})
         raise ArgumentError, "file required" unless file
+        raise ArgumentError, "method #{method} cannot be queued" unless QUEUEABLE_METHODS.include?(method)
 
-        operation = Operation.new(@ctx, method, @theme[file])
+        operation = Operation.new(@ctx, method, @theme[file], opts)
 
         # Already enqueued
         return if @pending.include?(operation)
@@ -219,7 +314,7 @@ module ShopifyCLI
         wait_for_backoff!
         @ctx.debug(operation.to_s)
 
-        response = send(operation.method, operation.file)
+        response = send(operation.method, operation.file, operation.options)
 
         @standard_reporter.report(operation.as_synced_message)
 
@@ -235,13 +330,9 @@ module ShopifyCLI
         @pending.delete(operation)
       end
 
-      def update(file)
-        asset = { key: file.relative_path.to_s }
-        if file.text?
-          asset[:value] = file.read
-        else
-          asset[:attachment] = Base64.encode64(file.read)
-        end
+      def update(file, opts = {})
+        merge = opts[:merge]
+        asset = asset_update_param(file, merge)
 
         _status, body, response = api_client.put(
           path: "themes/#{@theme.id}/assets.json",
@@ -249,6 +340,8 @@ module ShopifyCLI
         )
 
         update_checksums(body)
+
+        file.write(asset[:value]) if merge
 
         response
       end
@@ -275,10 +368,10 @@ module ShopifyCLI
         include_filter && !include_filter.match?(path)
       end
 
-      def get(file)
+      def get(file, opts = {})
         _status, body, response = api_client.get(
           path: "themes/#{@theme.id}/assets.json",
-          query: URI.encode_www_form("asset[key]" => file.relative_path.to_s),
+          query: URI.encode_www_form("asset[key]" => file.relative_path),
         )
 
         update_checksums(body)
@@ -287,20 +380,22 @@ module ShopifyCLI
         if attachment
           file.write(Base64.decode64(attachment))
         else
-          file.write(body.dig("asset", "value"))
+          content = body.dig("asset", "value")
+          content = Merger.merge!(file, content) if opts[:merge]
+
+          file.write(content)
         end
 
         response
       end
 
-      def delete(file)
+      def delete(file, opts = {})
         _status, _body, response = api_client.delete(
           path: "themes/#{@theme.id}/assets.json",
           body: JSON.generate(asset: {
-            key: file.relative_path.to_s,
+            key: file.relative_path,
           })
         )
-
         response
       end
 
@@ -320,14 +415,14 @@ module ShopifyCLI
       end
 
       def file_has_changed?(file)
-        file.checksum != @checksums[file.relative_path.to_s]
+        file.checksum != @checksums[file.relative_path]
       end
 
       def parse_api_errors(exception)
         parsed_body = JSON.parse(exception&.response&.body)
         message = parsed_body.dig("errors", "asset") || parsed_body["message"] || exception.message
         # Truncate to first lines
-        [message].flatten.map { |mess| mess.split("\n", 2).first }
+        [message].flatten.map { |m| m.split("\n", 2).first }
       rescue JSON::ParserError
         [exception.message]
       end
