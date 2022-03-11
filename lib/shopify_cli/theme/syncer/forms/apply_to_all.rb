@@ -25,7 +25,7 @@ module ShopifyCLI
           private
 
           def ask
-            ApplyToAllForm.ask(@ctx, []).ask
+            ApplyToAllForm.ask(@ctx, [], []).ask
           end
         end
       end

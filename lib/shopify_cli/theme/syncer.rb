@@ -5,10 +5,13 @@ require "base64"
 require "forwardable"
 
 require_relative "syncer/error_reporter"
-require_relative "syncer/standard_reporter"
-require_relative "syncer/operation"
-require_relative "theme_admin_api"
+require_relative "syncer/forms/apply_to_all"
+require_relative "syncer/forms/select_delete_strategy"
+require_relative "syncer/forms/select_update_strategy"
 require_relative "syncer/merger"
+require_relative "syncer/operation"
+require_relative "syncer/standard_reporter"
+require_relative "theme_admin_api"
 
 module ShopifyCLI
   module Theme
@@ -141,7 +144,7 @@ module ShopifyCLI
       def upload_theme!(delay_low_priority_files: false, delete: true, overwrite_json_files: true, &block)
         fetch_checksums!
 
-        delete_files_not_present_locally if delete
+        delete_files_not_present_locally(overwrite_json_files) if delete
 
         enqueue_updates(@theme.liquid_files)
         enqueue_json_updates(overwrite_json_files)
@@ -191,10 +194,11 @@ module ShopifyCLI
           .theme_files
           .reject(&:json?)
           .select { |file| !present_locally?(file) }
-          .map { |file| file.relative_path }
+          .map(&:relative_path)
 
         # Ask if remote json-files not present locally must be removed
-        apply_to_all = ApplyToAll.new(@ctx)
+        puts "apply to all 2"
+        apply_to_all = Forms::ApplyToAll.new(@ctx)
         json_files = @theme.json_files.select { |file| !present_locally?(file) }
         json_files.each do |file|
           action = apply_to_all.value || ask_delete_or_restore?(file)
@@ -227,14 +231,14 @@ module ShopifyCLI
         json_files = @theme.json_files - delayed_config_files + delayed_config_files
 
         if overwrite_json_files != false
-          enqueue_updates(removed_files)
+          enqueue_updates(json_files)
           return
         end
 
-        apply_to_all = ApplyToAll.new(@ctx)
+        puts "apply to all 1"
+        apply_to_all = Forms::ApplyToAll.new(@ctx)
         modified_json_files = json_files.select { |file| !ignore_file?(file) && file_has_changed?(file) }
         modified_json_files.each do |file|
-
           update_strategy = apply_to_all.value || ask_update_strategy(file)
           apply_to_all.apply?(update_strategy) if modified_json_files.size > 1
 
@@ -254,7 +258,7 @@ module ShopifyCLI
       end
 
       def ask_update_strategy(file)
-        Forms::SelectUpdateStrategy.new(file).ask.strategy
+        Forms::SelectUpdateStrategy.new(@ctx, [], file: file).ask.strategy
       end
 
       def ask_delete_or_restore?(file)
@@ -275,7 +279,7 @@ module ShopifyCLI
 
         return asset.merge(attachment: Base64.encode64(file.read)) unless file.text?
         return asset.merge(value: file.read) unless merge
-        return asset.merge(value: Merger.merge!(file, remote_text_content(file)))
+        asset.merge(value: Merger.merge!(file, remote_text_content(file)))
       end
 
       def report_error(operation, error_suffix = "")
@@ -387,7 +391,7 @@ module ShopifyCLI
         response
       end
 
-      def delete(file, opts = {})
+      def delete(file, _opts = {})
         _status, _body, response = api_client.delete(
           path: "themes/#{@theme.id}/assets.json",
           body: JSON.generate(asset: {

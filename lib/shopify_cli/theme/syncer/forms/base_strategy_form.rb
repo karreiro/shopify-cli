@@ -7,7 +7,7 @@ module ShopifyCLI
         class BaseStrategyForm < ShopifyCLI::Form
           attr_accessor :strategy
 
-          flag_arguments :file, :strategies
+          flag_arguments :file
 
           def ask
             self.strategy = CLI::UI::Prompt.ask(title, allow_empty: false) do |handler|
