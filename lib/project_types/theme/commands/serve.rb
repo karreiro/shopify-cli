@@ -16,6 +16,7 @@ module Theme
         parser.on("--port=PORT") { |port| flags[:port] = port.to_i }
         parser.on("--poll") { flags[:poll] = true }
         parser.on("--live-reload=MODE") { |mode| flags[:mode] = as_reload_mode(mode) }
+        parser.on("--pull-json-interval=SECONDS") { |seconds| flags[:pull_interval] = seconds.to_i }
       end
 
       def call(_args, name)
@@ -23,7 +24,11 @@ module Theme
         flags = options.flags.dup
         host = flags[:host] || DEFAULT_HTTP_HOST
         ShopifyCLI::Theme::DevServer.start(@ctx, root, host: host, **flags) do |syncer|
-          UI::SyncProgressBar.new(syncer).progress(:upload_theme!, delay_low_priority_files: true)
+          UI::SyncProgressBar.new(syncer).progress(
+            :upload_theme!,
+            delay_low_priority_files: true,
+            overwrite_json_files: false
+          )
         end
       rescue ShopifyCLI::Theme::DevServer::AddressBindingError
         raise ShopifyCLI::Abort,
