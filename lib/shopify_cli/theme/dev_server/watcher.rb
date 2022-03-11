@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+
 require "listen"
 require "observer"
+
+require_relative "watcher/remote_listen"
 
 module ShopifyCLI
   module Theme
@@ -9,7 +12,7 @@ module ShopifyCLI
       class Watcher
         include Observable
 
-        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false)
+        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false, pull_interval: 0)
           @ctx = ctx
           @theme = theme
           @syncer = syncer
@@ -18,15 +21,18 @@ module ShopifyCLI
             changed
             notify_observers(modified, added, removed)
           end
+          @remote_listener = RemoteListen.to(theme: @theme, syncer: @syncer, interval: pull_interval)
 
           add_observer(self, :upload_files_when_changed)
         end
 
         def start
           @listener.start
+          @remote_listener.start
         end
 
         def stop
+          @remote_listener.stop
           @listener.stop
         end
 
