@@ -196,19 +196,17 @@ module ShopifyCLI
         # Ask if remote json-files not present locally must be removed
         apply_to_all = ApplyToAll.new(@ctx)
         json_files = @theme.json_files.select { |file| !present_locally?(file) }
-        json_files
-          .each do |file|
-            action = apply_to_all.value || ask_delete_or_restore?(file)
-            apply_to_all.apply?(action) if json_files.size > 1
+        json_files.each do |file|
+          action = apply_to_all.value || ask_delete_or_restore?(file)
+          apply_to_all.apply?(action) if json_files.size > 1
 
-            if overwrite_json_files != false || action == :delete
-              removed_files << file
-              next
-            end
+          if overwrite_json_files != false || action == :delete
+            removed_files << file
+            next
+          end
 
-            if action == :restore
-              restored_files << file
-            end
+          if action == :restore
+            restored_files << file
           end
         end
 
