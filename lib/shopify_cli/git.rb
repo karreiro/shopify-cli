@@ -125,7 +125,7 @@ module ShopifyCLI
       #
       # #### Example
       #
-      #   output = ShopifyCLI::Git.merge_filee(current_file, base_file, other_file, opts = [], ctx: Context.new)
+      #   output = ShopifyCLI::Git.merge_file(current_file, base_file, other_file, opts, ctx: ctx)
       #
       def merge_file(current_file, base_file, other_file, opts = [], ctx: Context.new)
         output, status = ctx.capture2e("git", "merge-file", current_file, base_file, other_file, *opts)
