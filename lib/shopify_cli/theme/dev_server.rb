@@ -26,12 +26,13 @@ module ShopifyCLI
       class << self
         attr_accessor :ctx
 
-        def start(ctx, root, host: "127.0.0.1", port: 9292, poll: false, mode: ReloadMode.default)
+        def start(ctx, root, host: "127.0.0.1", port: 9292, poll: false, pull_interval: 0, mode: ReloadMode.default)
           @ctx = ctx
           theme = DevelopmentTheme.find_or_create!(ctx, root: root)
           ignore_filter = IgnoreFilter.from_path(root)
           @syncer = Syncer.new(ctx, theme: theme, ignore_filter: ignore_filter)
-          watcher = Watcher.new(ctx, theme: theme, syncer: @syncer, ignore_filter: ignore_filter, poll: poll)
+          watcher = Watcher.new(ctx, theme: theme, syncer: @syncer, ignore_filter: ignore_filter, poll: poll,
+            pull_interval: pull_interval)
 
           # Setup the middleware stack. Mimics Rack::Builder / config.ru, but in reverse order
           @app = Proxy.new(ctx, theme: theme, syncer: @syncer)
@@ -52,7 +53,7 @@ module ShopifyCLI
             if block_given?
               yield @syncer
             else
-              @syncer.upload_theme!(delay_low_priority_files: true)
+              @syncer.upload_theme!(delay_low_priority_files: true, overwrite_json: false)
             end
 
             return if stopped
