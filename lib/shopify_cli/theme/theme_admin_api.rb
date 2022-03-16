@@ -11,35 +11,19 @@ module ShopifyCLI
       end
 
       def get(path:, **args)
-        rest_request(
-          method: "GET",
-          path: path,
-          **args
-        )
+        rest_request(method: "GET", path: path, **args)
       end
 
       def put(path:, **args)
-        rest_request(
-          method: "PUT",
-          path: path,
-          **args
-        )
+        rest_request(method: "PUT", path: path, **args)
       end
 
       def post(path:, **args)
-        rest_request(
-          method: "POST",
-          path: path,
-          **args
-        )
+        rest_request(method: "POST", path: path, **args)
       end
 
       def delete(path:, **args)
-        rest_request(
-          method: "DELETE",
-          path: path,
-          **args
-        )
+        rest_request(method: "DELETE", path: path, **args)
       end
 
       def get_shop_or_abort # rubocop:disable Naming/AccessorMethodName

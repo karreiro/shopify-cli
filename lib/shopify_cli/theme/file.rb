@@ -4,7 +4,6 @@ require_relative "mime_type"
 module ShopifyCLI
   module Theme
     class File < Struct.new(:path)
-      attr_reader :relative_path
       attr_accessor :remote_checksum
 
       def initialize(path, root)
@@ -82,6 +81,18 @@ module ShopifyCLI
       # some of which may be relative paths while others are absolute paths.
       def ==(other)
         relative_path == other.relative_path
+      end
+
+      def name(*args)
+        ::File.basename(path, *args)
+      end
+
+      def absolute_path
+        path.realpath.to_s
+      end
+
+      def relative_path
+        @relative_path.to_s
       end
 
       private
