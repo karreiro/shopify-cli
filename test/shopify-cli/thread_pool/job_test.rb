@@ -50,7 +50,23 @@ module ShopifyCLI
         refute error_job.success?
         assert success_job.success?
       end
+
+      def test_recurring_when_it_returns_true
+        job = ValidJob.new(1)
+
+        assert(job.recurring?)
+        assert(1, job.interval)
+      end
+
+      def test_recurring_when_it_returns_false
+        job = ValidJob.new
+
+        refute(job.recurring?)
+        assert(0, job.interval)
+      end
     end
+
+    private
 
     class ValidJob < ShopifyCLI::ThreadPool::Job
       def perform!
