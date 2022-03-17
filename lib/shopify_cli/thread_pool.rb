@@ -39,8 +39,12 @@ module ShopifyCLI
     end
 
     def reschedule(job)
-      sleep(job.interval)
+      wait(job.interval)
       schedule(job)
+    end
+
+    def wait(seconds)
+      sleep(seconds)
     end
   end
 end
