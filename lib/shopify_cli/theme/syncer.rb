@@ -35,18 +35,22 @@ module ShopifyCLI
 
       def_delegators :@error_reporter, :has_any_error?
 
-      def initialize(ctx, theme:, include_filter: nil, ignore_filter: nil, overwrite_json: true)
+      def initialize(ctx, theme:, include_filter: nil, ignore_filter: nil, overwrite_json: true, pull_interval: 0)
         @ctx = ctx
         @theme = theme
         @include_filter = include_filter
         @ignore_filter = ignore_filter
         @overwrite_json = overwrite_json
+        @pull_interval = pull_interval
         @error_reporter = ErrorReporter.new(ctx)
         @standard_reporter = StandardReporter.new(ctx)
         @reporters = [@error_reporter, @standard_reporter]
 
         # Queue of `Operation`s waiting to be picked up from a thread for processing.
         @queue = Queue.new
+
+        # Queue of with the latest enqueued `Operation`s
+        @latest_operations_buffer = Queue.new
 
         # `Operation`s will be removed from this Array completed.
         @pending = []
@@ -143,7 +147,6 @@ module ShopifyCLI
             loop do
               operation = @queue.pop
               break if operation.nil? # shutdown was called
-              latest_operations << operation
               perform(operation)
             rescue Exception => e # rubocop:disable Lint/RescueException
               error_suffix = ": #{e}"
@@ -212,14 +215,16 @@ module ShopifyCLI
         @error_reporter.report("#{operation.as_error_message}#{error_suffix}")
       end
 
-      def enqueue(method, file, options = {})
+      def enqueue(method, file)
         raise ArgumentError, "file required" unless file
         raise ArgumentError, "method #{method} cannot be queued" unless QUEUEABLE_METHODS.include?(method)
 
-        operation = Operation.new(@ctx, method, @theme[file], options)
+        operation = Operation.new(@ctx, method, @theme[file])
 
         # Already enqueued
         return if @pending.include?(operation)
+
+        @latest_operations_buffer << operation
 
         if ignore_operation?(operation)
           @ctx.debug("ignore #{operation.file_path}")
@@ -244,12 +249,32 @@ module ShopifyCLI
 
       def conflict_detected?(operation)
         return false if overwrite_json?
-        return false unless [:update, :get].include?(operation.method)
+        return false if operation.method != :get
 
         modified_recently?(operation.file)
       end
 
-      def modified_recently?
+      def modified_recently?(file)
+        @latest_operations_buffer
+
+        now = Time.now
+        latest_updated_files = []
+        operation = @latest_operations_buffer.pop
+
+        while recent_update?(operation, now) && !@latest_operations_buffer.empty?
+          latest_updated_files << operation.file
+          operation = @latest_operations_buffer.pop
+        end
+
+        @latest_operations_buffer.clear
+
+        latest_updated_files.map(&:relative_path).include?(file.relative_path)
+      end
+
+      def recent_update?(operation, now)
+        return false if operation.method != :update
+        seconds_ago = operation.created_at - now
+        seconds_ago < @buffer_interval
       end
 
       def perform(operation)
@@ -257,7 +282,7 @@ module ShopifyCLI
         wait_for_backoff!
         @ctx.debug(operation.to_s)
 
-        response = send(operation.method, operation.file, operation.options)
+        response = send(operation.method, operation.file)
 
         return if operation.local?
 
