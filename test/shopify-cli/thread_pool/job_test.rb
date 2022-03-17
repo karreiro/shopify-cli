@@ -64,23 +64,21 @@ module ShopifyCLI
         refute(job.recurring?)
         assert(0, job.interval)
       end
-    end
 
-    private
-
-    class ValidJob < ShopifyCLI::ThreadPool::Job
-      def perform!
-        true
+      class ValidJob < ShopifyCLI::ThreadPool::Job
+        def perform!
+          true
+        end
       end
-    end
 
-    class InvalidJob < ShopifyCLI::ThreadPool::Job
-      # Without `#perform!` definition
-    end
+      class InvalidJob < ShopifyCLI::ThreadPool::Job
+        # Without `#perform!` definition
+      end
 
-    class ErrorJob < ShopifyCLI::ThreadPool::Job
-      def perform!
-        raise "error message"
+      class ErrorJob < ShopifyCLI::ThreadPool::Job
+        def perform!
+          raise "error message"
+        end
       end
     end
   end

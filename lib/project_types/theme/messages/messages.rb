@@ -135,7 +135,7 @@ module Theme
                 TITLE
                 keep_remote: "Keep the remote version",
                 keep_local: "Keep the local version",
-                remote_merge: "Merge files (it may break the local file)",
+                union_merge: "Merge files (it may break the local file)",
                 exit: "Exit",
               },
               delete_strategy: {

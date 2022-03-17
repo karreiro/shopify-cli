@@ -30,7 +30,7 @@ module ShopifyCLI
           @ctx = ctx
           theme = DevelopmentTheme.find_or_create!(ctx, root: root)
           ignore_filter = IgnoreFilter.from_path(root)
-          @syncer = Syncer.new(ctx, theme: theme, ignore_filter: ignore_filter)
+          @syncer = Syncer.new(ctx, theme: theme, ignore_filter: ignore_filter, overwrite_json: false)
           watcher = Watcher.new(ctx, theme: theme, syncer: @syncer, ignore_filter: ignore_filter, poll: poll,
             pull_interval: pull_interval)
 
@@ -53,7 +53,7 @@ module ShopifyCLI
             if block_given?
               yield @syncer
             else
-              @syncer.upload_theme!(delay_low_priority_files: true, overwrite_json: false)
+              @syncer.upload_theme!(delay_low_priority_files: true)
             end
 
             return if stopped

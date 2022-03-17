@@ -24,11 +24,7 @@ module Theme
         flags = options.flags.dup
         host = flags[:host] || DEFAULT_HTTP_HOST
         ShopifyCLI::Theme::DevServer.start(@ctx, root, host: host, **flags) do |syncer|
-          UI::SyncProgressBar.new(syncer).progress(
-            :upload_theme!,
-            delay_low_priority_files: true,
-            overwrite_json: false
-          )
+          UI::SyncProgressBar.new(syncer).progress(:upload_theme!, delay_low_priority_files: true)
         end
       rescue ShopifyCLI::Theme::DevServer::AddressBindingError
         raise ShopifyCLI::Abort,

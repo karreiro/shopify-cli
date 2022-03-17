@@ -15,7 +15,7 @@ module ShopifyCLI
             %i[
               keep_remote
               keep_local
-              remote_merge
+              union_merge
               exit
             ]
           end
