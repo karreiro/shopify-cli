@@ -13,7 +13,7 @@ module ShopifyCLI
           fixed: :cyan,
         }
 
-        def initialize(ctx, method, file, options)
+        def initialize(ctx, method, file)
           @ctx = ctx
           @method = method
           @file = file
