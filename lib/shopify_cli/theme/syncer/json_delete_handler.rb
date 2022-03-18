@@ -7,10 +7,10 @@ module ShopifyCLI
   module Theme
     class Syncer
       module JsonDeleteHandler
-        def enqueue_json_deletes(files, overwrite_json)
+        def enqueue_json_deletes(files)
           files = files.select { |file| !ignore_file?(file) }
 
-          if overwrite_json == true
+          if overwrite_json?
             enqueue_deletes(files)
           else
             # Handle conflicts when JSON files cannot be overwritten

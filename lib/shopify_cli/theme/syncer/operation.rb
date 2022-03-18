@@ -4,7 +4,7 @@ module ShopifyCLI
   module Theme
     class Syncer
       class Operation
-        attr_reader :options
+        attr_reader :created_at
         attr_accessor :method, :file
 
         COLOR_BY_STATUS = {
@@ -17,7 +17,7 @@ module ShopifyCLI
           @ctx = ctx
           @method = method
           @file = file
-          @options = options
+          @created_at = Time.now
         end
 
         def to_s
