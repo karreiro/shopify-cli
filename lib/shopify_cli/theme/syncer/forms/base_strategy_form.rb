@@ -8,11 +8,17 @@ module ShopifyCLI
           attr_accessor :strategy
 
           def ask
+
+            # Line break (otherwise, the question mark from `CLI::UI::Prompt` doesn't line break)
+            ctx.puts("\n")
+
             self.strategy = CLI::UI::Prompt.ask(title(file), allow_empty: false) do |handler|
               strategies.each do |strategy|
                 handler.option(as_text(strategy)) { strategy }
               end
             end
+
+            ctx.puts("\n")
 
             exit(0) if self.strategy == :exit
 

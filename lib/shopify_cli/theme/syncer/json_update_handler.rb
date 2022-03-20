@@ -18,24 +18,13 @@ module ShopifyCLI
           files = files
             .-(delayed_files)
             .+(delayed_files)
-            .select { |file| !ignore_file?(file) && file_has_changed?(file) }
+            .select { |file| !ignore_file?(file) && @checksums.file_has_changed?(file) }
 
           if overwrite_json?
             enqueue_updates(files)
           else
             # Handle conflicts when JSON files cannot be overwritten
             handle_update_conflicts(files)
-          end
-        end
-
-        def handle_update_conflict(file)
-          case ask_update_strategy(file)
-          when :keep_remote
-            enqueue(:get, file)
-          when :keep_local
-            enqueue(:update, file)
-          when :union_merge
-            enqueue(:union_merge, file)
           end
         end
 

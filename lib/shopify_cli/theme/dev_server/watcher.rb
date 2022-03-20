@@ -3,8 +3,6 @@
 require "listen"
 require "observer"
 
-require_relative "watcher/remote_listen"
-
 module ShopifyCLI
   module Theme
     module DevServer
@@ -21,18 +19,15 @@ module ShopifyCLI
             changed
             notify_observers(modified, added, removed)
           end
-          @remote_listener = RemoteListen.to(theme: @theme, syncer: @syncer, interval: pull_interval)
 
           add_observer(self, :upload_files_when_changed)
         end
 
         def start
           @listener.start
-          @remote_listener.start
         end
 
         def stop
-          @remote_listener.stop
           @listener.stop
         end
 

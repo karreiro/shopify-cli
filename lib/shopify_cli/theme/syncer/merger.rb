@@ -28,17 +28,24 @@ module ShopifyCLI
           # by creating a temporary file based on the `new_content`.
           #
           def git_merge(theme_file, new_content, opts)
-            remote_file = create_tmp_file(theme_file, new_content)
-            remote_path = remote_file.path
-            local_path = theme_file.absolute_path
 
-            ShopifyCLI::Git.merge_file(local_path, local_path, remote_path, opts)
+            remote_file = create_tmp_file(tmp_file_name(theme_file), new_content)
+            empty_file = create_tmp_file("empty")
+
+            ShopifyCLI::Git.merge_file(
+              theme_file.absolute_path,
+              empty_file.path,
+              remote_file.path,
+              opts
+            )
           ensure
-            remote_file.close! # Remove temporary file on Windows as well
+            # Remove temporary files on Windows as well
+            remote_file.close!
+            empty_file.close!
           end
 
-          def create_tmp_file(ref_file, content)
-            tmp_file = Tempfile.new(tmp_file_name(ref_file))
+          def create_tmp_file(basename, content = "")
+            tmp_file = Tempfile.new(basename)
             tmp_file.write(content)
             tmp_file.close # Make it ready to merge
             tmp_file

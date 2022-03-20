@@ -4,7 +4,6 @@ module ShopifyCLI
   module Theme
     class Syncer
       class Operation
-        attr_reader :created_at
         attr_accessor :method, :file
 
         COLOR_BY_STATUS = {
@@ -13,11 +12,10 @@ module ShopifyCLI
           fixed: :cyan,
         }
 
-        def initialize(ctx, method, file, options)
+        def initialize(ctx, method, file)
           @ctx = ctx
           @method = method
           @file = file
-          @created_at = Time.now
         end
 
         def to_s
@@ -38,10 +36,6 @@ module ShopifyCLI
 
         def file_path
           file&.relative_path.to_s
-        end
-
-        def local?
-          !%i(get update delete).include?(method)
         end
 
         private

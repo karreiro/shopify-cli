@@ -11,6 +11,7 @@ require_relative "dev_server/local_assets"
 require_relative "dev_server/proxy"
 require_relative "dev_server/sse"
 require_relative "dev_server/watcher"
+require_relative "dev_server/remote_watcher"
 require_relative "dev_server/web_server"
 require_relative "dev_server/certificate_manager"
 
@@ -30,9 +31,10 @@ module ShopifyCLI
           @ctx = ctx
           theme = DevelopmentTheme.find_or_create!(ctx, root: root)
           ignore_filter = IgnoreFilter.from_path(root)
-          @syncer = Syncer.new(ctx, theme: theme, ignore_filter: ignore_filter, overwrite_json: false, pull_interval: pull_interval)
+          @syncer = Syncer.new(ctx, theme: theme, ignore_filter: ignore_filter, pull_interval: pull_interval)
           watcher = Watcher.new(ctx, theme: theme, syncer: @syncer, ignore_filter: ignore_filter, poll: poll,
             pull_interval: pull_interval)
+          remote_watcher = RemoteWatcher.to(theme: theme, syncer: @syncer, interval: pull_interval)
 
           # Setup the middleware stack. Mimics Rack::Builder / config.ru, but in reverse order
           @app = Proxy.new(ctx, theme: theme, syncer: @syncer)
@@ -70,6 +72,7 @@ module ShopifyCLI
           end
 
           watcher.start
+          remote_watcher.start
           WebServer.run(
             @app,
             BindAddress: host,
@@ -77,6 +80,7 @@ module ShopifyCLI
             Logger: logger,
             AccessLog: [],
           )
+          remote_watcher.stop
           watcher.stop
 
         rescue ShopifyCLI::API::APIRequestForbiddenError,

@@ -130,8 +130,7 @@ module Theme
               },
               update_strategy: {
                 title: <<~TITLE,
-                  The local file '%s' is different from the remote file in the development theme.
-                  What would you like to do?
+                  The local file {{command:%s}} is different from the remote file in the development theme. What would you like to do?
                 TITLE
                 keep_remote: "Keep the remote version",
                 keep_local: "Keep the local version",
@@ -140,8 +139,7 @@ module Theme
               },
               delete_strategy: {
                 title: <<~TITLE,
-                  The file '%s' has been recently removed from your remote development theme.
-                  What would you like to do?
+                  The file {{command:%s}} has been recently removed from your remote development theme. What would you like to do?
                 TITLE
                 delete: "Delete permanently",
                 restore: "Restore with the local version",
