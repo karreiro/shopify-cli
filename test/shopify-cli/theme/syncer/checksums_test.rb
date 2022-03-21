@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "shopify_cli/theme/syncer"
+require "shopify_cli/theme/syncer/checksums"
 
 module ShopifyCLI
   module Theme
