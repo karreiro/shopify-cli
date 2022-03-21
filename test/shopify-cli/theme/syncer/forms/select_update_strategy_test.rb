@@ -17,7 +17,7 @@ module ShopifyCLI
             refute_empty(@form.strategies)
           end
 
-          def prefix
+          def test_prefix
             refute_empty(@form.prefix)
           end
         end
