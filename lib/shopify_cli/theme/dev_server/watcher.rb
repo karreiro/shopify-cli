@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "listen"
 require "observer"
 
@@ -9,7 +10,7 @@ module ShopifyCLI
       class Watcher
         include Observable
 
-        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false)
+        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false, pull_interval: 0)
           @ctx = ctx
           @theme = theme
           @syncer = syncer
@@ -59,7 +60,7 @@ module ShopifyCLI
         private
 
         def ignore_file?(file)
-          @ignore_filter&.ignore?(file.relative_path.to_s)
+          @ignore_filter&.ignore?(file.relative_path)
         end
       end
     end
