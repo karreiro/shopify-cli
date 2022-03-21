@@ -10,7 +10,7 @@ module ShopifyCLI
       class Watcher
         include Observable
 
-        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false, pull_interval: 0)
+        def initialize(ctx, theme:, syncer:, ignore_filter: nil, poll: false)
           @ctx = ctx
           @theme = theme
           @syncer = syncer

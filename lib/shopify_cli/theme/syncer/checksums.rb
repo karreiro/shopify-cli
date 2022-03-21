@@ -54,21 +54,10 @@ module ShopifyCLI
 
         # Private getters only used in unit tests
 
-        def checksum_by_key
-          @checksum_by_key
-        end
-
-        def checksum_history_by_key
-          @checksum_history_by_key
-        end
-
-        def theme
-          @theme
-        end
-
-        def checksums_mutex
-          @checksums_mutex
-        end
+        attr_reader :checksum_by_key
+        attr_reader :checksum_history_by_key
+        attr_reader :theme
+        attr_reader :checksums_mutex
       end
     end
   end
