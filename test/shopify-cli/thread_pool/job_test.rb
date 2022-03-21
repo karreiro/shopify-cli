@@ -55,14 +55,14 @@ module ShopifyCLI
         job = ValidJob.new(1)
 
         assert(job.recurring?)
-        assert(1, job.interval)
+        assert_equal(1, job.interval)
       end
 
       def test_recurring_when_it_returns_false
         job = ValidJob.new
 
         refute(job.recurring?)
-        assert(0, job.interval)
+        assert_equal(0, job.interval)
       end
 
       class ValidJob < ShopifyCLI::ThreadPool::Job
