@@ -41,7 +41,7 @@ module ShopifyCLI
       end
 
       def mime_type
-        @mime_type ||= MimeType.by_filename(relative_path)
+        @mime_type ||= MimeType.by_filename(@relative_path)
       end
 
       def text?
