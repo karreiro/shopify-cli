@@ -7,35 +7,6 @@ module ShopifyCLI
   module Theme
     class Syncer
       class MergerTest < Minitest::Test
-        def test_merge
-          file = theme_file(<<-CONTENT)
-            {
-              "name":"SHOPIFY CLI",
-              "version":"2",
-              "type":"tool"
-            }
-          CONTENT
-          new_content = <<-CONTENT
-            {
-              "name":"SHOPIFY CLI",
-              "version":"3",
-              "type":"tool"
-            }
-          CONTENT
-          expected_content = <<-CONTENT
-            {
-              "name":"SHOPIFY CLI",
-              "version":"3",
-              "type":"tool"
-            }
-          CONTENT
-          actual_content = Merger.merge(file, new_content)
-
-          assert_equal(expected_content, actual_content)
-        ensure
-          file.fs_file.close!
-        end
-
         def test_union_merge
           file = theme_file(<<-CONTENT)
             {

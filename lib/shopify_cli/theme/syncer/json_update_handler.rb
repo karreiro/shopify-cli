@@ -18,7 +18,7 @@ module ShopifyCLI
           files = files
             .-(delayed_files)
             .+(delayed_files)
-            .select { |file| !ignore_file?(file) && checksums.file_has_changed?(file) }
+            .select { |file| !ignore_file?(file) && file.exist? && checksums.file_has_changed?(file) }
 
           if overwrite_json?
             enqueue_updates(files)

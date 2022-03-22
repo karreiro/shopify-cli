@@ -8,13 +8,6 @@ module ShopifyCLI
       class Merger
         class << self
           ##
-          # Merge `theme_file` with the `new_content` by favoring lines from the `new_content`.
-          #
-          def merge(theme_file, new_content)
-            git_merge(theme_file, new_content, ["--theirs", "-p"])
-          end
-
-          ##
           # Merge `theme_file` with the `new_content` by relying on the union merge
           #
           def union_merge(theme_file, new_content)
