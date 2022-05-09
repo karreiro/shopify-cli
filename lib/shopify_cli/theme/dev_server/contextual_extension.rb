@@ -6,15 +6,20 @@ module ShopifyCLI
   module Theme
     module DevServer
       class ContextualExtension
-        def initialize(ctx, app)
+        def initialize(ctx, app, theme:)
           @ctx = ctx
           @app = app
+          @theme = theme
         end
 
         def call(env)
           if env["PATH_INFO"] == "/contextual-extension"
             return vscode_error unless VSCode.exists?(@ctx)
-            return open_file(file_path(env))
+
+            section = section_type(env)
+            section_file = @theme["sections/#{section}.liquid"]
+
+            return open_file(section_file.absolute_path) if section_file.exist?
           end
 
           status, headers, body = @app.call(env)
@@ -40,9 +45,9 @@ module ShopifyCLI
           response(500, { error: error })
         end
 
-        def file_path(env)
+        def section_type(env)
           form_data = URI.decode_www_form(env["rack.input"].read).to_h
-          form_data["file"]
+          form_data["section"]
         end
 
         def response(status, body)
