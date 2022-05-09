@@ -137,6 +137,7 @@ module ShopifyCLI
   autoload :TransformDataStructure, "shopify_cli/transform_data_structure"
   autoload :Tunnel, "shopify_cli/tunnel"
   autoload :Utilities, "shopify_cli/utilities"
+  autoload :VSCode, "shopify_cli/vscode"
 
   require "shopify_cli/messages/messages"
   Context.load_messages(ShopifyCLI::Messages::MESSAGES)
