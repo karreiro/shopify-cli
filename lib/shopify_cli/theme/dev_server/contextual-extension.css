@@ -1,0 +1,132 @@
+#shopify-cli-contextual-extension {
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+}
+
+#shopify-cli-inspector {
+  background-color: #fff;
+  z-index: 999999999;
+  position: fixed;
+  padding: 20px;
+  top: 20px;
+  right: -500px;
+  width: 400px;
+  padding-bottom: 30px;
+  transition: right .2s;
+  pointer-events: unset;
+  border-radius: 8px;
+  border-bottom: 1px solid #e3e3e3;
+  box-shadow:
+    0   0px  5px rgba(0, 0, 0, 0.05), 
+    0   1px  2px rgba(0, 0, 0, 0.15),
+    0   3px  2px rgba(0, 0, 0, 0.020),
+    0   7px  5px rgba(0, 0, 0, 0.030),
+    0  12px 10px rgba(0, 0, 0, 0.035),
+    0  22px 18px rgba(0, 0, 0, 0.040),
+    0  40px 32px rgba(0, 0, 0, 0.050),
+    0 100px 80px rgba(0, 0, 0, 0.079);
+}
+#shopify-cli-inspector.shopify-cli-expanded {
+  right: 20px;
+}
+#shopify-cli-inspector p,
+#shopify-cli-inspector a,
+#shopify-cli-inspector h1,
+#shopify-cli-inspector h2,
+#shopify-cli-inspector kbd,
+#shopify-cli-inspector span,
+#shopify-cli-inspector table,
+#shopify-cli-inspector .button {
+  /* font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; */
+  font-family: -apple-system, "system-ui", "San Francisco", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.03rem;
+}
+#shopify-cli-inspector h1,
+#shopify-cli-inspector h2 {
+  font-weight: 600;
+}
+#shopify-cli-inspector h1 {
+  font-size: 1.8rem;
+  margin: 5px 0 0;
+}
+#shopify-cli-inspector h2 {
+  font-size: 1.8rem;
+  margin: 32px 0 10px;
+}
+#shopify-cli-inspector table {
+  width: 100%;
+}
+#shopify-cli-inspector table.shopify-cli-data-table,
+#shopify-cli-inspector table.shopify-cli-data-table tbody,
+#shopify-cli-inspector table.shopify-cli-data-table tbody tr,
+#shopify-cli-inspector table.shopify-cli-data-table tbody tr td {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 14px;
+}
+#shopify-cli-inspector table,
+#shopify-cli-inspector table tbody,
+#shopify-cli-inspector table tbody tr,
+#shopify-cli-inspector table tbody tr td {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  padding: 0;
+}
+#shopify-cli-inspector kbd,
+#shopify-cli-inspector kbd::after {
+  background-color: #fff;
+  border-radius: 4px;
+  border: 1px solid #939598;
+  color: #6d7175;
+  line-height: 23px;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  text-align: center;
+  width: 24px;
+  height: 24px;
+  z-index: 1;
+}
+#shopify-cli-inspector kbd::after {
+  background: none;
+  border-radius: 0 0 4px 4px;
+  border-top: none;
+  content: "";
+  left: -1px;
+  position: absolute;
+  top: 1px;
+  z-index: 0;
+}
+#shopify-cli-inspector kbd,
+#shopify-cli-inspector span {
+  display: inline-block;
+  font-size: 13px;
+  vertical-align: bottom;
+  opacity: .9;
+}
+#shopify-cli-inspector span {
+  padding-top: 5px;
+  line-height: 26px;
+}
+#shopify-cli-inspector .shopify-cli-button {
+  display: inline-block;
+  margin: 10px 0 0;
+  background: #fff;
+  transition: all .2s;
+  color: #43454a;
+  border: 1px solid #babfc3;
+  text-decoration: none;
+  border-radius: 4px;
+  box-shadow: rgb(0, 0, 0, .1) 0px 1px 0px 0px;
+  padding: 4px 14px;
+  font-size: 14px;
+}
+#shopify-cli-inspector .shopify-cli-button:hover {
+  background: #f2f2f2;
+}

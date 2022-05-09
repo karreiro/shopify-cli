@@ -68,7 +68,18 @@ module ShopifyCLI
 
         def inject_contextual_extension_js(body)
           js = ::File.read("#{__dir__}/contextual-extension.js")
-          js_body = ["<script>", js, "</script>", "</body>"].join("\n")
+          css = ::File.read("#{__dir__}/contextual-extension.css")
+          html = ::File.read("#{__dir__}/contextual-extension.html")
+          js_body = [
+            "<style type='text/css'>",
+            css,
+            "</style>",
+            "<script>",
+            js,
+            "</script>",
+            html,
+            "</body>"
+          ].join("\n")
 
           body = body.join.gsub("</body>", js_body)
 
