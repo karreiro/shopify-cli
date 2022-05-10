@@ -15,13 +15,15 @@
   position: fixed;
   padding: 20px;
   top: 20px;
-  right: -500px;
-  width: 400px;
+  right: -600px;
+  width: 550px;
+  max-width: calc(100% - 40px);
+  max-height: calc(100% - 40px);
   padding-bottom: 30px;
   transition: right .2s;
   pointer-events: unset;
-  border-radius: 8px;
   border-bottom: 1px solid #e3e3e3;
+  overflow-y: auto;
   box-shadow:
     0   0px  5px rgba(0, 0, 0, 0.05), 
     0   1px  2px rgba(0, 0, 0, 0.15),
@@ -36,13 +38,12 @@
   right: 20px;
 }
 #shopify-cli-inspector p,
-#shopify-cli-inspector a,
 #shopify-cli-inspector h1,
 #shopify-cli-inspector h2,
 #shopify-cli-inspector kbd,
 #shopify-cli-inspector span,
 #shopify-cli-inspector table,
-#shopify-cli-inspector .button {
+#shopify-cli-inspector .shopify-cli-button {
   /* font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; */
   font-family: -apple-system, "system-ui", "San Francisco", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   letter-spacing: -0.03rem;
@@ -53,15 +54,20 @@
 }
 #shopify-cli-inspector h1 {
   font-size: 1.8rem;
-  margin: 5px 0 0;
+  margin: 0 0 10px;
 }
 #shopify-cli-inspector h2 {
   font-size: 1.8rem;
-  margin: 32px 0 10px;
+  margin: 28px 0 10px;
 }
 #shopify-cli-inspector table {
   width: 100%;
 }
+#shopify-cli-inspector ul {
+  padding: 0 0 0 20px;
+  margin: 0;
+}
+#shopify-cli-inspector ul,
 #shopify-cli-inspector table.shopify-cli-data-table,
 #shopify-cli-inspector table.shopify-cli-data-table tbody,
 #shopify-cli-inspector table.shopify-cli-data-table tbody tr,
@@ -77,6 +83,9 @@
   outline: none;
   box-shadow: none;
   padding: 0;
+}
+#shopify-cli-inspector table tbody tr td:first-child {
+  width: 30%;
 }
 #shopify-cli-inspector kbd,
 #shopify-cli-inspector kbd::after {
@@ -129,4 +138,17 @@
 }
 #shopify-cli-inspector .shopify-cli-button:hover {
   background: #f2f2f2;
+  text-decoration: none;
+}
+#shopify-cli-inspector a {
+  color: rgb(44, 110, 203);
+}
+#shopify-cli-inspector a,
+#shopify-cli-inspector #shopify-cli-sections li {
+  cursor: pointer;
+  text-decoration: none;
+}
+#shopify-cli-inspector a:hover,
+#shopify-cli-inspector #shopify-cli-sections li:hover {
+  text-decoration: underline;
 }

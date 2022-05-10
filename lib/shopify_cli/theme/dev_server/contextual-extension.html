@@ -4,55 +4,68 @@
 
   <h1>Shopify CLI inspector</h1>
 
-  <h2>Info</h2>
+  <!-- <h2>Info</h2> -->
   <table class="shopify-cli-data-table">
     <tr>
-      <td>path</td>
-      <td>/</td>
+      <td>Theme ID</td>
+      <td id="shopify-cli-theme-id"></td>
     </tr>
     <tr>
-      <td>Tests</td>
-      <td>No tests</td>
+      <td>Theme name</td>
+      <td id="shopify-cli-theme-name"></td>
+    </tr>
+    <tr>
+      <td>Store</td>
+      <td id="shopify-cli-store"></td>
     </tr>
   </table>
-  <a href="#" class="shopify-cli-button">
-    Run page tests
-  </a>
 
   <h2>Metrics</h2>
   <table class="shopify-cli-data-table">
     <tr>
-      <td>path</td>
-      <td>/</td>
+      <td>Path</td>
+      <td id="shopify-cli-path"></td>
     </tr>
     <tr>
-      <td>Tests</td>
-      <td>No tests</td>
+      <td>Loading time</td>
+      <td id="shopify-cli-loading-time"></td>
+    </tr>
+    <tr>
+      <td>Accessibility</td>
+      <td>A</td>
+    </tr>
+    <tr>
+      <td>Best practices</td>
+      <td>B</td>
     </tr>
   </table>
-  <a href="#" class="shopify-cli-button">
-    Run page tests
-  </a>
 
-  <h2>Testing</h2>
+  <h2>Tests</h2>
   <table class="shopify-cli-data-table">
+
     <tr>
-      <td>path</td>
-      <td>/</td>
+      <td>Page tests</td>
+      <td>
+        No tests (<a href="#">create page test &#8594;</a>)
+      </td>
     </tr>
     <tr>
-      <td>Tests</td>
-      <td>No tests</td>
+      <td>Section tests</td>
+      <td>
+        No tests (<a href="#">create section test &#8594;</a>)
+      </td>
     </tr>
   </table>
 
   <a href="#" class="shopify-cli-button">
-    Run page tests
+    Run all tests
   </a>
 
+  <h2>Sections</h2>
+  <ul id="shopify-cli-sections">
+  </ul>
 
   <h2>Keyboard shortcuts</h2>
-
   <table>
     <tr>
       <td>
