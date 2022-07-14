@@ -78,11 +78,11 @@ module ShopifyCLI
       end
 
       def lock_io!
-        @reporters.each(&:disable!)
+        # @reporters.each(&:disable!)
       end
 
       def unlock_io!
-        @reporters.each(&:enable!)
+        # @reporters.each(&:enable!)
       end
 
       def enqueue_updates(files)
@@ -362,6 +362,8 @@ module ShopifyCLI
           next unless asset["key"]
           checksums[asset["key"]] = asset["checksum"]
         end
+
+        puts checksums.to_s
 
         checksums.reject_duplicated_checksums!
       end

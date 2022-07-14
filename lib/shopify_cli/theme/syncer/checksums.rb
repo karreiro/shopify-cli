@@ -34,6 +34,10 @@ module ShopifyCLI
           end
         end
 
+        def to_s
+          checksum_by_key.to_s
+        end
+
         # Generate .liquid asset files are reported twice in checksum:
         # once of generated, once for .liquid. We only keep the .liquid, that's the one we have
         # on disk.
